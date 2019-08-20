@@ -1,9 +1,6 @@
 # dependencies
 /node_modules
 
-# production output
-/dist
-
 # babel and tsc output
 /dist-babel
 /dist-ts
