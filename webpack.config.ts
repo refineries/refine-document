@@ -34,7 +34,8 @@ const config: webpack.Configuration = {
   },
   output: {
     filename: 'js/[name].[hash:6].js',
-    path: path.resolve(__dirname, 'dist')
+    path: path.resolve(__dirname, 'dist'),
+    publicPath: '/refine-document/dist/'
   },
   devServer: configDevServer,
   resolve: {
