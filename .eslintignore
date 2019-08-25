@@ -1,0 +1,4 @@
+dist-babel/**/*
+dist-tsc/**/*
+dist/**/*
+node_modules/**/*
