@@ -12,7 +12,6 @@ import TypescriptLoader from 'ts-loader';
 
 const isEnvDevelopment = process.env.NODE_ENV === 'development';
 const isEnvProduction = process.env.NODE_ENV === 'production';
-const isEnvEnableSourceMap = process.env.ENABLE_SOURCE_MAP === 'true';
 
 const configDevServer: webpackDevServer.Configuration = {
   host: 'localhost',
@@ -34,20 +33,19 @@ const config: webpack.Configuration = {
   },
   output: {
     filename: 'js/[name].[hash:6].js',
-    path: path.resolve(__dirname, 'dist'),
-    publicPath: '/refine-document/dist/'
+    path: path.resolve(__dirname, 'dist')
   },
   devServer: configDevServer,
   resolve: {
-    extensions: ['.tsx', '.ts', '.jsx', '.js', '.vue', '.json'],
+    extensions: ['.tsx', '.ts', '.jsx', '.js', '.json'],
     alias: {
-      'react-dom': '@hot-loader/react-dom'
+      'react-dom': isEnvDevelopment ? '@hot-loader/react-dom' : 'react-dom'
     }
   },
   module: {
     rules: [
       {
-        test: /\.(ts|tsx)?$/,
+        test: /\.(ts|tsx|js|jsx)?$/,
         exclude: /node_modules/,
         enforce: 'pre',
         use: [
@@ -61,7 +59,7 @@ const config: webpack.Configuration = {
         ]
       },
       {
-        test: /\.(ts|tsx)?$/,
+        test: /\.(ts|tsx|js|jsx)?$/,
         exclude: /node_modules/,
         use: [
           {
@@ -81,33 +79,7 @@ const config: webpack.Configuration = {
         ]
       },
       {
-        test: /\.(js|jsx)?$/,
-        exclude: /node_modules/,
-        enforce: 'pre',
-        use: [
-          {
-            loader: require.resolve('eslint-loader'),
-            options: {
-              cache: true,
-              failOnError: true
-            }
-          }
-        ]
-      },
-      {
-        test: /\.(js|jsx)?$/,
-        exclude: /node_modules/,
-        use: [
-          {
-            loader: require.resolve('babel-loader'),
-            options: {
-              cacheDirectory: true
-            }
-          }
-        ]
-      },
-      {
-        test: /\.s(c|a)ss?$/,
+        test: /\.(css|scss|sass)?$/,
         use: [
           isEnvDevelopment
             ? {
@@ -141,36 +113,6 @@ const config: webpack.Configuration = {
         ]
       },
       {
-        test: /\.css?$/,
-        use: [
-          isEnvDevelopment
-            ? {
-                loader: require.resolve('style-loader'),
-                options: {}
-              }
-            : {
-                loader: MiniCssExtractPlugin.loader,
-                options: {}
-              },
-          {
-            loader: require.resolve('css-loader'),
-            options: {
-              importLoaders: 1,
-              modules: {
-                mode: 'local',
-                localIdentName: '[path][name]__[local]--[hash:base64:5]',
-                context: path.resolve(__dirname, 'src'),
-                hashPrefix: 'refine'
-              }
-            }
-          },
-          {
-            loader: require.resolve('postcss-loader'),
-            options: {}
-          }
-        ]
-      },
-      {
         test: /\.(jpg|jpeg|png|woff|woff2|ttf)?$/,
         use: [
           {
@@ -186,7 +128,7 @@ const config: webpack.Configuration = {
     ]
   },
   plugins: [
-    new CleanWebpackPlugin() as webpack.Plugin, // delete folder dist
+    isEnvProduction && (new CleanWebpackPlugin() as webpack.Plugin), // delete folder dist
     new webpack.ProgressPlugin(), // show progress
     isEnvDevelopment && new webpack.HotModuleReplacementPlugin(),
     isEnvProduction &&
@@ -207,12 +149,13 @@ const config: webpack.Configuration = {
       filename: path.resolve(__dirname, 'dist/index.html'),
       favicon: 'public/favicon.ico'
     }), // inject css and js and resources into html
-    new BundleAnalyzerPlugin({
-      analyzerMode: 'static',
-      openAnalyzer: false
-    }) // size analysis
+    isEnvProduction &&
+      new BundleAnalyzerPlugin({
+        analyzerMode: 'static',
+        openAnalyzer: false
+      }) // size analysis
   ].filter(Boolean) as webpack.Plugin[],
-  devtool: isEnvEnableSourceMap ? 'source-map' : undefined,
+  devtool: isEnvDevelopment ? 'source-map' : undefined,
   optimization: {
     noEmitOnErrors: true,
     minimizer: [
