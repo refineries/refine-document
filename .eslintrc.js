@@ -13,7 +13,6 @@ module.exports = {
     'eslint:recommended', // eslint recommended rules
     'plugin:@typescript-eslint/eslint-recommended', // @typescript-eslint/eslint-plugin in order to overlay eslint:recommended rules
     'plugin:@typescript-eslint/recommended', // @typescript-eslint/eslint-plugin recommended rules
-    'plugin:@typescript-eslint/recommended-requiring-type-checking', // @typescript-eslint/eslint-plugin recommended additional rules
     'plugin:react/recommended', // eslint-plugin-react recommended rules
     'plugin:import/recommended', // eslint-plugin-import recommended rules
     'plugin:import/typescript', // eslint-plugin-import typescript rules
@@ -36,7 +35,6 @@ module.exports = {
     commonjs: true
   },
   parserOptions: {
-    project: './tsconfig.eslint.json',
     ecmaFeatures: {
       jsx: true
     },
