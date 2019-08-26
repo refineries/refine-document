@@ -67,7 +67,7 @@ const config: webpack.Configuration = {
           {
             loader: require.resolve('thread-loader'),
             options: {
-              poolTimeout: Infinity
+              poolTimeout: isEnvDevelopment ? Infinity : 2000
             }
           },
           {
