@@ -6,9 +6,11 @@ import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import OptimizeCssAssetsWebpackPlugin from 'optimize-css-assets-webpack-plugin';
 import CopyWebpackPlugin from 'copy-webpack-plugin';
 import TerserPlugin from 'terser-webpack-plugin';
+import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin';
+import ForkTsCheckerNotifierWebpackPlugin from 'fork-ts-checker-notifier-webpack-plugin';
+import TypescriptLoader from 'ts-loader';
 import { CleanWebpackPlugin } from 'clean-webpack-plugin';
 import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
-import TypescriptLoader from 'ts-loader';
 
 const isEnvDevelopment = process.env.NODE_ENV === 'development';
 const isEnvProduction = process.env.NODE_ENV === 'production';
@@ -63,6 +65,12 @@ const config: webpack.Configuration = {
         exclude: /node_modules/,
         use: [
           {
+            loader: require.resolve('thread-loader'),
+            options: {
+              poolTimeout: Infinity
+            }
+          },
+          {
             loader: require.resolve('babel-loader'),
             options: {
               cacheDirectory: true
@@ -71,8 +79,8 @@ const config: webpack.Configuration = {
           {
             loader: require.resolve('ts-loader'),
             options: {
-              transpileOnly: false,
-              happyPackMode: false,
+              transpileOnly: true,
+              happyPackMode: true,
               logInfoToStdOut: true
             } as TypescriptLoader.Options
           }
@@ -131,6 +139,16 @@ const config: webpack.Configuration = {
     isEnvProduction && (new CleanWebpackPlugin() as webpack.Plugin), // delete folder dist
     new webpack.ProgressPlugin(), // show progress
     isEnvDevelopment && new webpack.HotModuleReplacementPlugin(),
+    new ForkTsCheckerWebpackPlugin({
+      vue: true,
+      checkSyntacticErrors: true,
+      async: true
+    }), // additional typescript typechecking to speedup
+    new ForkTsCheckerNotifierWebpackPlugin({
+      title: 'TypeScript',
+      excludeWarnings: true,
+      skipSuccessful: true
+    }), // show system error dialog on type checking error occurs
     isEnvProduction &&
       new MiniCssExtractPlugin({
         filename: 'css/[name].[chunkhash:6].css',
